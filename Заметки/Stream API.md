@@ -89,3 +89,28 @@ long count = bigList.parallelStream() // Использует ForkJoinPool
 ```
 # Ленивые вычисления (Lazy Evaluation) в Java Stream API
 **Ленивые вычисления** - это стратегия, при которой операции не выполняются сразу, а откладываются до момента, когда результат действительно нужен. В Java Stream API большинство промежуточных операций (*intermediate operations*) являются ленивыми (*lazy*), а терминальные (*terminal operations*) - жадными (*eager*).
+## Как это работает?
+1. Промежуточные операции (например, filter, map, sorted) просто добавляются в конвейер, но не выполняются сразу.
+2. Терминальная операция, (например, collect, forEach, count) запускает весь контейнер, и только тогда данные начинают обрабатываться.
+### Пример:
+```java
+List<String> names = Arrays.asList("Alice", "Bob", "Charlie");
+
+// Промежуточные операции (ленивые)
+Stream<String> stream = names.stream()
+	.filter(name -> {
+		System.out.println("Фильтрация: " + name); // Не выполнится сразу
+		return name.length() > 3;
+	})
+	.map(name -> {
+		System.out.println("Маппинг: " + name); // Тоже не выполнится
+		return name.toUpperCase();
+	});
+
+// Терминальная операция (активирует выполнение)
+List<String> result = stream.collect(Collectors.toList())
+```
+Вывод:
+```bash
+
+```
