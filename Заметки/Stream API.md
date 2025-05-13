@@ -268,3 +268,30 @@ List<Integer> safeList = IntStream.range(0, 1000)
 	.boxed()
 	.collect(Collectors.toList());
 ```
+### 2. Порядок элементов
+```java
+List<Integer> nums = List.of(1, 2, 3, 4, 5);
+nums.parallelStream().forEach(System.out::print); // Может вывести "3 1 5 2 4"
+```
+Если порядок важен:
+```java
+nums.parallelStream().forEachOrdered(System.out::print); // Гарантирует порядок: 1 2 3 4 5
+```
+### 3. Производительность
+- **Параллельные потоки не всегда быстрее** (из-за накладных расходов на создание потоков).
+- **Зависит от количества ядер CPU** (на 2-ядерном CPU ускорение будет меньше, чем 16-ядерном).
+## Настройка Parallel Stream
+### 1. Использование своего ForkJoinPool
+По умолчанию *Parallel Stream* использует *ForkJoinPool.commonPool()*.
+Если нужно задать свой пул потоков:
+```java
+ForkJoinPool customPool = new ForkJoinPool(4); // Пул из 4 потоков
+customPool.submit(() -> numbers.parallelStream()
+	.map(n -> n * 2)
+	.forEach(System.out::println)
+).get();
+```
+### 2. Изменение уровня параллелизма
+```java
+System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "8"); // 8 потоков
+```
