@@ -1,9 +1,42 @@
-```dataviewjs
-const headers = dv.current().file.headings;
-if (headers) {
-  dv.list(headers.map(h => `${"  ".repeat(h.level - 1)}- [[#${h.heading}]]`));
-}
+```insta-toc
+---
+title:
+  name: Оглавление
+  level: 1
+  center: false
+exclude: ""
+style:
+  listType: dash
+omit: []
+levels:
+  min: 1
+  max: 6
+---
+
+# Table of Contents
+
+- Аббревиатура SOLID расшифровывается так:
+- 1. Single Responsibility Principle (SRP)
+    - Суть:
+    - Прмер:
+- 2. Open-Closed Principle (OCP)
+    - Суть:
+        - Зачем нужен OCP?
+    - Примеры:
+        - 1.
+        - 2.
+    - Способы соблюдения OCP
+- 3. Liskov Sustitution Principle (LSP)
+    - Суть:
+    - Пример:
+- 4. Interface Segregation Principle (ISP)
+    - Суть:
+    - Пример:
+- 5. Dependency Inversion Principle (DIP)
+    - Суть:
+    - Пример:
 ```
+
 **SOLID** - это набор из пяти принципов объектно-ориентированного проектирования (ООП), которые позволяют создать гибкий, поддерживаемый и масштабируемый код.
 ## Аббревиатура SOLID расшифровывается так:
 1. **S - Single Responsibility Principle**. Принцип единственной ответственности.
