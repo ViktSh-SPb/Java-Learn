@@ -3,6 +3,22 @@
 Реализуйте класс, хранящий набор значений при помощи односвязного списка. Напишите программу, иллюстрирующую использование класса.
 Односвязный список - это структура, хранящая данные в виде цепочки, каждый узел которой хранит очередное значение списка и ссылку на следующий узел (см. рис.). Ссылка на следующий узел последнего элемента списка равна null.
 ```mermaid
-graph LR
-	A(('Data'|Pointer))-->B((Data|Pointer))
+stateDiagram-v2
+	direction LR
+		nexta-->B
+		state A {
+			dataa
+			nexta
+		}
+		state B {
+			direction LR
+			datab
+			nextb
+		}
+```
+```mermaid
+stateDiagram-v2
+    direction LR
+    State1 -[hidden]-> State2
+    State2 -[hidden]-> State1
 ```
