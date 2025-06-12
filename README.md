@@ -61,6 +61,7 @@ flowchart LR
     С_prev --> NodeB
     B_prev --> NodeA
     C_next --> NodeT@{ shape: text, label: "Null" }
-    NodeH@{ shape: text, label: "Null" } ~~~ A_prev
+    NodeH@{ shape: text, label: "Null" } --> NodeA
+    
 
 ```
