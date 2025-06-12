@@ -22,5 +22,5 @@ flowchart LR
     B_next --> NodeC
 
 	classDef small width:80px, height:30px
-    classDef big width:80%, height:80px
+    classDef big width:80, height:280px
 ```
