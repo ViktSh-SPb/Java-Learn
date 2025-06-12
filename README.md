@@ -3,22 +3,21 @@
 Реализуйте класс, хранящий набор значений при помощи односвязного списка. Напишите программу, иллюстрирующую использование класса.
 Односвязный список - это структура, хранящая данные в виде цепочки, каждый узел которой хранит очередное значение списка и ссылку на следующий узел (см. рис.). Ссылка на следующий узел последнего элемента списка равна null.
 ```mermaid
-stateDiagram-v2
-	direction LR
-		nexta-->B
-		state A {
-			dataa
-			nexta
-		}
-		state B {
-			direction LR
-			datab
-			nextb
-		}
-```
-```mermaid
-stateDiagram-v2
-    direction LR
-    State1 -[hidden]-> State2
-    State2 -[hidden]-> State1
+%%{init: {'config': {'width': '100%', 'height': '100%'}}}%%
+flowchart LR
+    subgraph NodeA[" "]
+        direction LR
+        A_val[val: A] ~~~ A_next[next: •]
+    end
+    subgraph NodeB[" "]
+        direction LR
+        B_val[val: B] --> B_next[next: •]
+    end
+    subgraph NodeC[" "]
+        direction LR
+        C_val[val: C] --> C_next[next: NULL]
+    end
+    A_next --> NodeB
+    B_next --> NodeC
+    
 ```
