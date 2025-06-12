@@ -6,21 +6,20 @@
 ```mermaid
 %%{init: {'config': {'width': '100%', 'useMaxWidth': true}}}%%
 flowchart LR
-    subgraph NodeA[" "]
+    subgraph NodeA["Head"]
         direction LR
-        A_val[data]:::big ~~~ A_next[next]
+        A_val[data] ~~~ A_next[next]
     end
     subgraph NodeB[" "]
         direction LR
-        B_val[val: B] --> B_next[next: •]
+        B_val[data] ~~~ B_next[next]
     end
-    subgraph NodeC[" "]
+    subgraph NodeC["Tail"]
         direction LR
-        C_val[val: C] --> C_next[next: NULL]
+        C_val[data] ~~~ C_next[next]
     end
     A_next --> NodeB
     B_next --> NodeC
+    C_next --> NodeD@{ shape: text, label: "Null" }
 
-	classDef small width:80px, height:30px
-    classDef big width:80, height:480px
 ```
