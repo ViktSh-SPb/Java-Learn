@@ -42,11 +42,12 @@ flowchart LR
 ```mermaid
 %%{init: {'config': {'width': '100%', 'useMaxWidth': true}}}%%
 flowchart LR
+	NodeH@{ shape: text, label: "Null" } ~~~ NodeA
     subgraph NodeA["Head"]
         direction LR
-        A_prev[prev] ~~~ A_val[────
-        data
-        ────] ~~~ A_next[next]
+        A_prev[prev] ~~~ A_val[░░░░░░░░░░░░
+        ░░░░░DATA░░░░░
+        ░░░░░░░░░░░░] ~~~ A_next[next]
     end
     subgraph NodeB[" "]
         direction LR
@@ -61,7 +62,7 @@ flowchart LR
     С_prev --> NodeB
     B_prev --> NodeA
     C_next --> NodeT@{ shape: text, label: "Null" }
-    NodeH@{ shape: text, label: "Null" } --> NodeA
+    A_prev --> NodeH
     
 
 ```
