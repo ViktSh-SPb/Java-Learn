@@ -45,9 +45,9 @@ flowchart LR
 	NodeH@{ shape: text, label: "Null" } ~~~ NodeA
     subgraph NodeA["Head"]
         direction LR
-        A_prev[prev] ~~~ A_val[░░░░░░░░░░░░
-        ░░░░░DATA░░░░░
-        ░░░░░░░░░░░░] ~~~ A_next[next]
+        A_prev[prev] ~~~ A_val[┌──────────┐
+        │---DATA---│
+        └──────────┘] ~~~ A_next[next]
     end
     subgraph NodeB[" "]
         direction LR
