@@ -14,6 +14,7 @@ INNER JOIN departments ON employees.dept_id = departments.id;
 ```
 - Вернет только тех сотрудников, у которых есть отдел.
 ## 2. LEFT JOIN (LEFT OUTER JOIN) - левое внешнее соединение
+![Alt text](./attachments/left.svg)
 - Возвращает все строки из левой таблицы, даже если в правой нет соответствий.
 - Если нет совпадения - поля из правой таблицы будут NULL.
 - Пример:
@@ -24,6 +25,7 @@ LEFT JOIN departments ON employees.dept_id = departments.id;
 ```
 - Вернет всех сотрудников, даже если они не прикреплены к отделу.
 ## RIGHT JOIN (RIGHT OUTER JOIN) - правое внешнее соединение
+![Alt text](./attachments/right.svg)
 - Противоположность LEFT JOIN: все строки из правой таблицы, даже без совпадений слева.
 - Пример:
 ```sql
@@ -33,6 +35,7 @@ RIGHT JOIN departments ON employees.dept_id = departments.id;
 ```
 - Покажет все отделы, даже если в них нет сотрудников.
 ## 4. FULL JOIN (FULL OUTER JOIN) - полное внешнее соединение
+![Alt text](./attachments/full.svg)
 - Возвращает все строки из обеих таблиц.
 - Где нет совпадений - заполняется NULL.
 - Пример:
