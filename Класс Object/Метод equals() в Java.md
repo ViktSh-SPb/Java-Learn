@@ -58,4 +58,93 @@ person1.equals(person3)? true
 ```
 ## Контракт equals()
 1. Рефлексивность. Для любого ненулевого x - x.equals(x) возвращает true.
-2. Симметричность. Для любых x и y: x.equals(y) 
+2. Симметричность. Для любых x и y: x.equals(y) ⇔ y.equals(x).
+3. Транзитивность. Если x.equals(y) = true  и y.equals(z) = true, то x.equals(z) = true.
+4. Согласованность. Многократные вызовы x.equals(y) при неизменных объектах всегда дают один и тот же результат.
+5. Сравнение с null. Для любого x - x.equals(null) = false.
+## Практические советы
+- Используйте @Override над equals.
+- Сравнивайте типы осторожно: getClass() (строгая типовая эквивалентность) вместо instanceof (разрешает сравнение с подклассами). Выбор зависит от семантики класса.
+- Для полей используйте Objects.equals(a, b) (безопасно для null) и Float.compare() / Double.compare() для чисел с плавающей точкой.
+- Если класс изменяемый и его поля участвуют в equals, аккуратно с изменением полей - это может нарушить поведение в коллекциях, например в HashSet.
+- Рассмотрите record (Java 16+) - он автоматически реализует equals(), hashCode(), toString.
+- Генерируйте equals() и hashCode() через IDE - обычно правильно и быстро.
+## Примеры
+### Простой неизменяемый класс (рекомендуемый вариант)
+```java
+import java.util.Objects;
+
+public final class Person {
+	private final String name;
+	private final int age;
+	
+	public Person(String name, int age) {
+		this.name = name;
+		this.age = age;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;                                // тот же объект
+		if (0 == null || getClass != o.getClass()) return false;   // строгая проверка
+		Person person = (Person) o;
+		return age == person.age && Objects.equals(name, person.name);
+	}
+	
+	@Override
+	public int hashCode(){
+		return Objects.hash(name, age);
+	}
+}
+```
+### Случай, когда нужен instanceof() (поддержка подклассов)
+```java
+import java.util.Objects
+
+public class Point {
+	private final int x, y;
+	
+	pubilc Point(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Point)) return false          // разрешаем подклассы
+		Point p = (Point) o;
+		return x == p.x && y == p.y;
+	}
+	
+	@Override
+	pubilc int hashCode() {
+		return Objects.hash(x, y);
+	}
+}
+```
+Если разрешаете сравнение с подклассами, учтите возможные нарушения симметричности, если подкласс расширяет состояние. Для безопасного сравнения с подклассами используйте шаблон canEqual.
+### Шаблон canEqual (для безопасного equals() в иерархиях)
+```java
+public class A {
+	private final int a;
+	
+	public boolean canEqual(Object other) {
+		return other instanceof A;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof A)) return false;
+		A other = (A) o;
+		if (!other.canEqual(this)) return false;
+		reutrn this.a == other.a;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Integer.hashCode(a);
+	}
+}
+```
