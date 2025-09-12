@@ -53,12 +53,13 @@ UPDATE accounts SET balance = balance - 200 WHERE user_id = 1;
 3. **"Фантомное чтение" (Phantom read)** - появляются новые строки, которых раньше не было.
 ### Уровни изоляции (от слабых к сильным):
 
-| Уровень          | Грязное чтение | Неповторяемое чтение | Фантомное чтение |
-| ---------------- | -------------- | -------------------- | ---------------- |
-| Read Uncommitted | ДА             | ДА                   | ДА               |
-| Read Committed   | НЕТ            | ДА                   | ДА               |
-| Repeatable Read  | НЕТ            | НЕТ                  | ДА               |
-| Serializable     | НЕТ            | НЕТ                  | НЕТ              |
+| Уровень          | Грязное чтение                       | Неповторяемое чтение                 | Фантомное чтение                     |
+| ---------------- | ------------------------------------ | ------------------------------------ | ------------------------------------ |
+| Read Uncommitted | <span style="color:green;">ДА</span> | <span style="color:green;">ДА</span> | <span style="color:green;">ДА</span> |
+| Read Committed   | <span style="color:red;">НЕТ</span>  | <span style="color:green;">ДА</span> | <span style="color:green;">ДА</span> |
+| Repeatable Read  | <span style="color:red;">НЕТ</span>  | <span style="color:red;">НЕТ</span>  | <span style="color:green;">ДА</span> |
+| Serializable     | <span style="color:red;">НЕТ</span>  | <span style="color:red;">НЕТ</span>  | <span style="color:red;">НЕТ</span>  |
+|                  |                                      |                                      |                                      |
 ### Пример:
 ```sql
 -- Транзакция 1 (изменяет данные)

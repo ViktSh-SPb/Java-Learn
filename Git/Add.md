@@ -57,3 +57,16 @@ git reset file.txt
 ```bash
 git checkout -- file.txt
 ```
+## Частые ошибки
+### 1. Добавил лишний файл
+```bash
+git reset HEAD file.txt         # убрать из индекса
+```
+### 2. Файл добавлен, но игнорируется (есть в .gitignore)
+```bash
+git add -f file.log            # принудительное добавление
+```
+### 3. Добавил бинарный файл (весит 100+ мб)
+```bash
+git reset big_file.zip         # и добавить его в .gitignore 
+```
