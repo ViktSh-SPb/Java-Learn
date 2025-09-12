@@ -147,4 +147,22 @@ public class A {
 		return Integer.hashCode(a);
 	}
 }
+
+public class B extends A {
+	private final int b;
+	
+	@Override
+	public boolean canEqual(Object other) {
+		return other instanceof B;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof B)) return false;
+		if (!super.equals(o)) return false;
+		B other = (B) o;
+		return this.b == other.b;
+	}
+}
 ```
