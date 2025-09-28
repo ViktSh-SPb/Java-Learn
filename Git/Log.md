@@ -12,3 +12,25 @@ git log
 | Автор                          | `Author: Viktor <vikt.sh@gmail.com>`                                                                |
 | Дата                           | `Date:   Mon Sep 15 14:06:40 2025 +0300`                                                            |
 | <nobr>Сообщение коммита</nobr> | `Вынес конфиг, реализовал Circuit Breaker`                                                          |
+## Полезные форматы вывода
+### 1. Компактный вид (одна строка на коммит)
+```bash
+git log -- oneline
+```
+Пример вывода:
+```bash
+6356eda (HEAD -> docker, origin/docker) Адаптировал под Докер
+55f3c50 (tag: hw7_release, origin/master, master) Вынес конфиг, реализовал Circuit Breaker
+65b484f Связал сервисы через eureka, добавил config-service
+b520f04 Добавил gateway-service, eureka-server
+```
+### 2. Графическое отображение ветвления
+```bash
+git log --graph --oneline
+```
+Пример вывода:
+### 3. Показать изменения в файлах
+```bash
+git log -p   # --patch
+```
+Показывает разницу (diff) для каждого коммита.
