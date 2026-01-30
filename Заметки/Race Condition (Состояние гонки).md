@@ -30,15 +30,50 @@ pulic class Counter {
 ```
 ### Пример возникновения Race Condition
 ```java
-public class RaceConditionDemo {
-	private static int counter = 0;
+public class RaceConditionDemo {  
+    private static int counter = 0;  
+  
+    public static void main(String[] args) throws InterruptedException{  
+        Runnable task = () -> {  
+            for (int i = 0; i < 10000; i++) {  
+                counter++;                    // Race Condition здесь  
+            }  
+        };  
+  
+        Thread thread1 = new Thread(task);  
+        Thread thread2 = new Thread(task);  
+  
+        thread1.start();  
+        thread2.start();  
+  
+        thread1.join();  
+        thread2.join();  
+  
+        System.out.println("Ожидаемый результат: 20000");  
+        System.out.println("Фактический результат: " + counter);  
+        // результат может быть меньше из-за Race Condition  
+    }  
+}
+```
+## Типы Race Conditions
+### 1. Check-then-act
+```java
+if (map.containsKey(key)) {       // check
+	String value = map.get(key);  // act - может быть удалено другим потоком
+	System.out.println(value);
+}
+```
+### 2. Read-modify-write
+```java
+counter++;   // чтение - изменение - запись
+```
+### 3. Публикация объектов
+```java
+public class UnsafePublication {
+	private SomeObject obj;
 	
-	public static void main(String[] args) throws InterruptedException{
-		Runnable task = () -> {
-			for (int i = 0; i < 1000; i++) {
-				counter++;                    // Race Condition здесь
-			}
-		};
+	public void initialize() {
+		obj = new SomeObject(); // Другой поток может увидеть частично созданный объект
 	}
 }
 ```
