@@ -2,6 +2,15 @@
 **volatile** - это модификатор переменной, который гарантирует:
 - **Видимость** - изменения переменной видны всем потокам сразу.
 - **Запрет переупорядочивания** - компилятор и процессор не могут переупорядочивать операции с volatile-переменными.
+volatile полезен для:
+- ✅Простых флагов остановки
+- ✅Переменных состояния
+- ✅Сценариев "один пишет - многие читают"
+- ✅Double-checked locking
+Не подходит для:
+- ❌Составных операций (инкремент, декремент)
+- ❌Операций, зависящих от нескольких переменных
+- ❌Сложных критических секций
 ### Проблема без volatile
 ```java
 class SharedData {
@@ -19,7 +28,7 @@ class SharedData {
 	}
 }
 ```
-В этом коде один поток может изменить flag, но другой поток может никогда не увидеть это изменение из-за кэширования процессором.
+В этом коде один поток может изменить `flag`, но другой поток может никогда не увидеть это изменение из-за кэширования процессором.
 ### Решение с volatile
 ```java
 class SharedData {
@@ -77,9 +86,9 @@ public void run() {
 	}
 }
 ```
-Поток run() крутится в цикле, другой поток вызывает stop(). 
-- Без volatile JVM может закэшировать isRunning и поток может стать бесконечным.
-- С volatile каждое чтение isRunning происходит из main memory.
+Поток `run()` крутится в цикле, другой поток вызывает `stop()`. 
+- Без **volatile** JVM может закэшировать `isRunning` и поток может стать бесконечным.
+- С **volatile** каждое чтение `isRunning` происходит из main memory.
 ### 2. Простые счетчики только для чтения
 ```java
 volatile int configVersion = 0;
@@ -96,7 +105,7 @@ if (configVersion < localVersion) {
 }
 ```
 Запись и чтение атомарны (нет ++, +=, check-then-act).
-Что гарантирует volatile: читатели всегда видят актуальное значение, нет необходимости в synchronized.
+Что гарантирует **volatile**: читатели всегда видят актуальное значение, нет необходимости в *synchronized*.
 ### 3. Singleton с double-checked locking
 ```java
 class Singleton {
@@ -122,7 +131,7 @@ volatile int count = 0;
 count++; // Это не атомарная операция. Нужно использовать AtomicInteger или synchronized
 ```
 Почему это ошибка:
-count++ - 3 операции:
+`count++` - 3 операции:
 1. read count
 2. increment
 3. write count
@@ -144,4 +153,62 @@ b = 2;
 
 // Поток 2 может увидеть b = 2, но a = 0
 ```
-volatile гарантирует порядок только для одной переменной.
+**volatile** гарантирует порядок только для одной переменной.
+## Сравнение с другими подходами
+### volatile vs synchronized
+- **volatile** - только видимость
+```java
+volatile int x = 0;
+```
+- **synchronized** - видимость + атомарность
+```java
+synchronized void increment () {
+	x++;
+}
+```
+### volatile vs Atomic-классы
+```java
+volatile int counter = 0;                           // Только видимость
+AtomicInteger atomicCounter = new AtomicInteger(0); // Видимость + атомарность
+
+counter++;                                          // volatile - небезопасно
+atomicCounter.incrementAndGet();                    // atomic - безопасно
+```
+## Практический пример
+```java
+public class VolatileExample {
+	private volatile boolean shutdownRequested = false;
+	
+	public void shutdown() {
+		shutdownRequested = true;
+	}
+	
+	public void doWork() {
+		while (!shutdownRequested) {
+			// Выполняем работу
+			System.out.println("Wroking...");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
+		}
+		System.out.println("Shutdown requested, stopping work");
+	}
+	
+	puplic static void main(String[] args) throws InterruptedException {
+		VolatileExample example = new VolatileExample();
+		
+		Thread worker = new Thread(example::doWork);
+		worker.start();
+		
+		Thread.sleep(5000);
+		example.shutdown();
+		worker.join();
+	}
+}
+```
+## Ограничения Happens-Before
+**volatile** создает отношения *happens-before*:
+- Запись в *volatile* переменную *happens-before* последующего чтения той же переменной.
+- Все операции до записи в *volatile* переменную видны после чтения этой переменной.
