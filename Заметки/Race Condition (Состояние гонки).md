@@ -1,5 +1,5 @@
 # Race Condition (Состояние гонки)
-Race Condition (состояние гонки) - это ошибка в многопоточном программировании, когда поведение программы зависит от относительного порядка выполнения потоков, который непредсказуем и может меняться от запуска к запуску.
+**Race Condition (состояние гонки)** - это ошибка в многопоточном программировании, когда поведение программы зависит от относительного порядка выполнения потоков, который непредсказуем и может меняться от запуска к запуску.
 ## Простой пример
 ```java
 pulic class Counter {
@@ -15,7 +15,7 @@ pulic class Counter {
 }
 ```
 ### Почему возникает проблема?
-Операция count++ состоит из трех шагов:
+Операция `count++` состоит из трех шагов:
 1. Чтение значения count из памяти.
 2. Увеличение значения на 1
 3. Запись нового значения обратно в память
@@ -77,3 +77,139 @@ public class UnsafePublication {
 	}
 }
 ```
+## Реальные примеры проблем
+### 1. Банковский счет
+```java
+pulic class BankAccount {
+	private double balance;
+	
+	public void withdraw(double amount) {
+		if (balance >= amount) {               // Check
+			balance = balance - amount;        // Act - race condition
+		}
+	}
+}
+```
+### 2. Кэширование
+```java
+public class Cache {
+	private Map<String, String> cache = new HashMap<>();
+	
+	public String get(String key) {
+		if (!cache.containsKey(key)) {       // Check
+			cache.put(key, loadFromDB(key)); // Act - другой поток может добавить
+		}
+		return chache.get(key);
+	}
+}
+```
+## Способы предотвращения race condition
+### 1. Синхронизация
+```java
+public class SafeCounter {
+	private int count = 0;
+	
+	public synchronized void increment() {
+		count++;
+	}
+	
+	public int getCount() {
+		return count;
+	}
+}
+```
+### 2. Atomic классы
+```java
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class AtomicCounter {
+	private AtomicInteger count = new AtomicInteger(0);
+	
+	public void increment() {
+		count.incrementAndGet();    // Атомарная операция
+	}
+	
+	public int getCount() {
+		return count.get();
+	}
+}
+```
+### 3. Lock объекты
+```java
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+public class LockCounter {
+	private int count = 0;
+	private Lock lock = new ReentrantLock();
+	
+	public void increment() {
+		lock.lock();
+		try {
+			count++;
+		} finally {
+			lock.unlock();
+		}
+	}
+}
+```
+### 4. Thread-local переменные
+```java
+public class ThreadLocalExample {
+	private static ThreadLocal<Integer> count = ThreadLoal.withInitial(() -> 0);
+	
+	public void increment() {
+		threadLocalCount.set(threadLocalCount.get() + 1);
+	}
+}
+```
+### 5. Неизменяемые объекты
+```java
+public final class ImmutableValue {
+	private final in value;
+	
+	public ImmutableValue(int value) {
+		this.value = value;
+	}
+	
+	public int getValue() {
+		return value;
+	}
+	
+	public ImmutableValue add(int valueToAdd) {
+		return new ImmutableValue(this.value + valueToAdd);
+	}
+}
+```
+## Правильные паттерны
+### 1. Double-checked locking (для Singleton)
+```java
+public class Singleton {
+	private static volatile Singleton instance;
+	
+	public static Singleton getInstance() {
+		if (instance == null) {                 // Первая проверка
+			synchronized (Singleton.class) {
+				if (instance == null) {         // Вторая проверка
+					instance = new Singleton();
+				}
+			}
+		}
+	}
+}
+```
+### 2. Thread-safe коллекции
+**ConcurrentHashMap**, **CopyOnWriteArrayList**
+## Обнаружение race condition
+### 1. Статический анализ
+- **FindBugs**, **PMD**, **SpotBugs**
+- **CheckStyle**
+### 2. Динамический анализ
+- **Thread sanitizer (TSan)**
+- Стресс-тестирование
+- JUnit с многопоточными тестами
+### 3. Визуальный осмотр кода
+Ищите:
+- Несинхронизированные изменяемые состояния
+- Совместно используемые ресурсы
+- Операции check-then-act
