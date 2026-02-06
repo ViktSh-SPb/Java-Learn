@@ -197,4 +197,5 @@ private Object getFirstLock(Object a, Object b) {
 private Object getSecondLock(Object a, Object b) {
 	return System.identityHashCode(a) < System.identityHashCode(b) ? b : a;
 }
+// Порядок основан на identityHashCode, всегда одинаков
 ```
