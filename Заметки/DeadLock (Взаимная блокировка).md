@@ -91,3 +91,110 @@ public class SimpleDeadLock {
 ```
 ## Обнаружение DeadLock
 ### 1. Jstack utility
+Jstack - это утилита из JDK для диагностики потоков JVM
+#### Что делает
+1. Снимает thread dump (дамп всех потоков JVM)
+2. Показывает:
+	- Состояние каждого потока (RUNNABLE, BLOCKED, WAITING, TIMED_WAITING)
+	- stack trace каждого потока
+	- кто держит монитор (locked <...>)
+	- deadlocks
+#### Зачем используют
+- JVM "висит", но CPU ≈ 0
+- Приложение не отвечает
+- Подозрение на deadlock
+- Потоки заблокированы на synchronized
+- Анализ проблем в проде (без перезапуска)
+#### Примеры использования
+```bash
+# 1.  Узнать PID Java-процесса
+jps
+
+# 2. Снять дамп
+jstack <pid>
+
+# Или сразу в файл
+jstack <pid> threaddump.txt
+
+# Подробная информация о локах
+jstack -l <pid>
+
+# Принудительно (если процесс завис)
+jstack -F <pid>
+```
+#### Что искать в дампе
+- BLOCKED → борьба за synchronized
+- WAITING / TIMED_WAITING → wait, sleep, park
+- Одинаковые stack trace → возможный deadlock
+- Found one Java-level deadlock → обнаружен deadlock
+#### Когда НЕ поможет
+- Утечки памяти → jmap
+- Высокий CPU → jstack + top
+- GC-проблемы → jstat, GC-логи
+### 2. JConsole или VisualVM
+Показывают информацию о потоках и блокировках
+#### JConsole
+- Встроенный GUI-инструмент JDK
+- Подключается к JVM по JMX
+- Вкладка **Threads** → кнопка **Detect Deadlock**
+- Показывает, какие потоки и на каких мониторах зависли
+- Подходит для быстрой проверки (локально / тест)
+#### VisualVM
+- Более мощный GUI-инструмент
+- Threads → Deadlock (автоматически подсвечивает)
+- Показывает граф зависимостей потоков
+- Можно делать thread dump, анализировать историю
+- Удобнее для глубокого анализа
+### 3. Программное обнаружение
+```java
+ThreadMXBean bean = ManagementFactory.getThreadMXBean();
+long[] threadIds = bean.findDeadlockedThreads();
+if (threadIds != null) {
+	System.out.println("Deadlock detected!");
+}
+```
+**`ThreadMXBean`** — это JMX-интерфейс для мониторинга и управления потоками JVM.
+#### Что он даёт
+Через ThreadMXBean JVM позволяет заглянуть внутрь потоков во время работы:
+- список всех потоков
+- состояние потоков (`RUNNABLE`, `BLOCKED`, `WAITING`…)
+- stack trace потоков
+- кто держит какие локи
+- обнаружение deadlock
+- CPU-время потоков (если включено)
+#### Откуда он берётся
+`ThreadMXBean bean = ManagementFactory.getThreadMXBean();`
+`ManagementFactory` — фабрика стандартных **MXBean’ов JVM**  
+`ThreadMXBean` — один из них.
+#### Пример возможностей
+```java
+bean.getThreadCount();          // сколько потоков
+bean.getAllThreadIds();         // ID всех потоков
+bean.getThreadInfo(id);         // инфо о конкретном потоке
+bean.findDeadlockedThreads();   // поиск deadlock
+```
+## Способы предотвращения DeadLock
+### 1. Упорядочивание блокировок
+```java
+// НЕПРАВИЛЬНО - может привести к deadlock:
+synchronized (lock1) {
+	synchronized (lock2) {
+		// ...
+	}
+}
+
+// ПРАВИЛЬНО - всегда одинаковый порядок:
+synchronized (getFirstLock(lock1, lock2)) {
+	synchronized (getSecondLock(lock1, lock2)) {
+		// ...
+	}
+}
+
+private Object getFirstLock(Object a, Object b) {
+	return System.identityHashCode(a) < System.identityHashCode(b) ? a : b;
+}
+
+private Object getSecondLock(Object a, Object b) {
+	return System.identityHashCode(a) < System.identityHashCode(b) ? b : a;
+}
+```
