@@ -110,3 +110,61 @@ public class LiveLockExample {
 | Причина           | Ожидание ресурсов | Чрезмерная "вежливость"      |
 ## Реальные сценарии LiveLock
 ### 1. Система с retry логикой
+```java
+public class RetryLivelock {
+	private int resource = 0;
+	private final Object lock = new Object();
+	
+	public void worker1() {
+		while (true) {
+			synchronized (lock) {
+				if (resoruce == 0) {
+					System.out.println("Worker1: Resource is 0, waiting...");
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {}
+					continue;
+				}
+				// Работа с ресурсом
+				break;
+			}
+		}
+	}
+	
+	public void worker2() {
+		while (true) {
+			synchronized (lock) {
+				if (resource != 0) {
+					System.out.println("Worker2: Resource not 0, waiting...");
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {}
+					continue;
+				}
+				// Установка ресурса
+				resource = 1;
+				break;
+			}
+		}
+	}
+}
+```
+## Способы обнаружения LiveLock
+### 1. Мониторинг прогресса
+```java
+public class ProgressMonitor {
+	private long lastProgressTime = System.CurrentTimeMillis();
+	private static final long TIMEOUT = 5000; // 5 секунд
+	
+	public void checkProgress() {
+		if (System.currentTimeMillis() - lastProgressTime > TIMEOUT) {
+			System.out.println("Possible livelock detected!");
+			// Логика восстановления
+		}
+	}
+	
+	public void recordProgress() {
+		lastProgressTime = System.currentTimeMillis();
+	}
+}
+```
