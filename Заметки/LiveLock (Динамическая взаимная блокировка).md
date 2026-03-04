@@ -149,6 +149,37 @@ public class RetryLivelock {
 	}
 }
 ```
+### 2. Retry с откатом
+```java
+public class RetryLivelockExample {
+
+    private final AtomicInteger value = new AtomicInteger(0);
+
+    public void worker() {
+        while (true) {
+            int current = value.get();
+
+            if (value.compareAndSet(current, current + 1)) {
+                System.out.println(Thread.currentThread().getName() + " updated");
+                break;
+            } else {
+                System.out.println(Thread.currentThread().getName() + " retry");
+                // слишком агрессивный retry без backoff
+            }
+        }
+    }
+}
+```
+Если оба потока:
+- читают одно значение
+- одновременно пытаются обновить
+- оба проигрывают CAS
+- оба мгновенно повторяют
+Получается активная борьба без прогресса.
+В реальных системах это решают:
+- backoff
+- random delay
+- exponential retry
 ## Способы обнаружения LiveLock
 ### 1. Мониторинг прогресса
 ```java
@@ -168,3 +199,129 @@ public class ProgressMonitor {
 	}
 }
 ```
+### 2. Счетчики операций
+```java
+public class OperationCounter {
+	private final AtomicLong operationCount = new AtomicLong(0);
+	private long lastCount = 0;
+	private static final long CHECK_INTERVAL = 1000;
+	
+	public void monitor() {
+		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+		scheduler.scheduleAtFixedRate(() -> {
+			long currentCount = operationCount.get();
+			if (currentCount == lastCount) {
+				System.out.println("No progress - possible livelock");
+			}
+			lastCount = currentCount;
+		}, CHECK_INTERVAL, CHECK_INTERVAL, TimeUnit.MILLISECONDS);
+	}
+	
+	public void increment() {
+		operationCount.incrementAndGet();
+	}
+}
+```
+## Способы предотвращения LiveLock
+### 1. Рандомизация времени ожидания
+```java
+public class RandomizedBackoff {
+	private final Random random = new Random();
+	
+	public void performOperation() {
+		int attempts = 0;
+		while (true) {
+			if (tryOperation()) {
+				return; // Успех
+			}
+			
+			// Экспоненциальная рандомизация backoff
+			long delay = (long) (Math.pow(2, attempts) * random.nextDouble());
+			try {
+				Thread.sleep(Math.min(delay, 1000)); // Максимум 1 секунда
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				break;
+			}
+			attempts++;
+		}
+	}
+	
+	private boolean tryOperation() {
+		// Попытка выполнить операцию
+		return false; // Заглушка
+	}
+}
+```
+### 2. Ограничение количества попыток
+```java
+public class LimitedAttempts {
+	private static final int MAX_ATTEMPTS = 10;
+	
+	public boolean executeWithRetry() {
+		int attempts = 0;
+		while (attempts < MAX_ATTEMPTS) {
+			if (tryExecute()) {
+				return true;
+			}
+			attempts++;
+			try {
+				Thread.sleep(100 * attempts);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				break;
+			}
+		}
+		return false;
+	}
+}
+```
+### 3. Приоритизация потоков
+```java
+public class PrioritizedExecution {
+	private final AtomicBoolean highPriorityActive = new AtomicBoolean(false);
+	
+	public void highPriorityTask() {
+		highPriorityActive.set(true);
+		try {
+			// Выполнение высокоприоритетной задачи
+		} finally {
+			highPriorityActive.set(false);
+		}
+	}
+	
+	public void lowPriorityTask() {
+		while (highPriorityActive.get()) {
+			// Ждем завершения высокоприоритетной задачи
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				break;
+			}
+			// Выполняем низкоприоритетную задачу
+		}
+	}
+}
+```
+### 4. Использование таймаутов
+```java
+public class TimeoutExecution {
+	public void executeWithTimeout() {
+		ExecutorService executor = Executors.newSingleThreadExecutor();
+		Future<?> future = executor.submit(() -> {
+			// Код, который может привести к Livelock
+		});
+		try {
+			future.get(5, TimeUnit.SECONDS); // Таймаут 5 секунд
+		} catch (TimeoutException e) {
+			future.cancel(true);
+			System.out.println("Operation timed out - possible livelock");
+		} catch (Exception e) {
+			// Обработка других исключений
+		} finally {
+			executor.shutdown();
+		}
+	}
+}
+```
+## Практический пример решения
