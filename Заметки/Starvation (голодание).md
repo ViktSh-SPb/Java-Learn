@@ -38,3 +38,4 @@ public class PriorityStarvation {
     }  
 }
 ```
+### 2. Starvation из-за synchronized
