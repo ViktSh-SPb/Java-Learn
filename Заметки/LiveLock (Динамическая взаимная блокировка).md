@@ -327,5 +327,81 @@ public class TimeoutExecution {
 ## Практический пример решения
 ### Исходная проблема с "вежливыми" философами
 ```java
-public class FixedPhilo
+public class FixedPhilosopher implements Runnable {  
+  
+    private final Spoon spoon;  
+    private final Spoon neighbourSpoon;  
+    private final String name;  
+    private final Random random = new Random();  
+    private int failedAttempts = 0;  
+  
+    public FixedPhilosopher(Spoon spoon, Spoon neighbourSpoon, String name) {  
+        this.spoon = spoon;  
+        this.neighbourSpoon = neighbourSpoon;  
+        this.name = name;  
+    }  
+  
+    @Override  
+    public void run() {  
+        while (true) {  
+            think();  
+            eat();  
+        }  
+    }  
+  
+    private void think() {  
+        System.out.println(name + " is thinking");  
+        try {  
+            Thread.sleep(random.nextInt(1000));  
+        } catch (InterruptedException e) {}  
+    }  
+  
+    private void eat() {  
+        // После нескольких неудач становимся "эгоистичными"  
+        if (failedAttempts > 3) {  
+            synchronized (spoon) {  
+                synchronized (neighbourSpoon) {  
+                    System.out.println(name + " is eating (selfish mode)");  
+                    failedAttempts = 0; // Сброс счетчика  
+                }  
+            }  
+            return;  
+        }  
+  
+        // Обычный режим - вежливый  
+        if (spoon.tryAcquire(100, TimeUnit.MICROSECONDS)) {  
+            try {  
+                if (neighbourSpoon.tryAcquire(100, TimeUnit.MICROSECONDS)) {  
+                    try {  
+                        System.out.println(name + " is eating");  
+                        failedAttempts = 0; // Успех - сброс счетчика  
+                    } finally {  
+                        neighbourSpoon.release();  
+                    }  
+                } else {  
+                    failedAttempts++;  
+                }  
+            } finally {  
+                spoon.release();  
+            }  
+        } else {  
+            failedAttempts++;  
+        }  
+    }  
+}
 ```
+## Лучшие практики предотвращения LiveLock
+1. ✅Используйте рандомизированные backoff стратегии
+2. ✅Ограничивайте количество повторных попыток
+3. ✅Вводите приоритеты для критических операций
+4. ✅Используйте таймауты для всех операций ожидания
+5. ✅Мониторьте прогресс выполнения операций
+6. ✅Избегайте симметричного поведения потоков
+7. ✅Проектируйте систему с асимметричными ролями
+## Инструменты для диагностики
+### 1. JStack и JVisualVM
+- Анализ состояния потоков
+- Выявление активных но не прогрессирующих потоков
+### 2. Профилировщики CPU
+- Показывают методы, которые потребляют CPU без результата
+### 3. Кастомные метрики
