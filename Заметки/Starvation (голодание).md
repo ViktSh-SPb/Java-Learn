@@ -39,3 +39,47 @@ public class PriorityStarvation {
 }
 ```
 ### 2. Starvation из-за synchronized
+```java
+public class SynchronizedStarvation {  
+    public static final Object lock = new Object();  
+    public static int counter = 0;  
+  
+    public static void main(String[] args) {  
+        // Жадный поток  
+        Thread greedyThread = new Thread(() -> {  
+            while (true) {  
+                synchronized (lock) {  
+                    counter++;  
+                    System.out.println("Greedy: " + counter);  
+                    // Долгая работа в synchronized блоке  
+                    try {  
+                        Thread.sleep(1000);  
+                    } catch (InterruptedException e) {}  
+                }  
+            }  
+        });  
+          
+        // "Вежливый" поток  
+        Thread politeThread = new Thread(() -> {  
+            while (true) {  
+                synchronized (lock) {  
+                    counter++;  
+                    System.out.println("Polite: " + counter);  
+                    // Короткая работа  
+                }  
+                try {  
+                    Thread.sleep(10);  
+                } catch (InterruptedException e) {}  
+            }  
+        });  
+          
+        greedyThread.start();  
+        politeThread.start();  
+    }  
+}
+```
+## Разница между Starvation и другими проблемами
+
+|     |     |     |
+| --- | --- | --- |
+|     |     |     |
