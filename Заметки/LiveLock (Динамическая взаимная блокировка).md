@@ -325,3 +325,7 @@ public class TimeoutExecution {
 }
 ```
 ## Практический пример решения
+### Исходная проблема с "вежливыми" философами
+```java
+public class FixedPhilo
+```
