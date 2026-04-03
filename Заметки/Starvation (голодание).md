@@ -173,3 +173,126 @@ public class WaitTimeMonitor {
     }  
 }
 ```
+### 2. Статистика выполнения
+```java
+public class ExecutionStats {  
+  
+    private final AtomicLong executionCount = new AtomicLong(0);  
+    private final AtomicLong waitTime = new AtomicLong(0);  
+    private final long threadId = Thread.currentThread().getId();  
+  
+    public void recordExecution(long duration) {  
+        executionCount.incrementAndGet();  
+    }  
+  
+    public void recordWait(long duration) {  
+        waitTime.addAndGet(duration);  
+    }  
+  
+    public double getWaitToExecutionRatio() {  
+        return (double) waitTime.get() / executionCount.get();  
+    }  
+}
+```
+## Способы предотвращения Starvation
+### 1. Справедливые блокировки (Fair Lock)
+```java
+public class FairLockExample {  
+	// Используется конструктор с включенным FAIR  
+    private final ReentrantLock fairLock = new ReentrantLock(true);
+    public void fairMethod(){  
+        fairLock.lock();  
+        try {  
+            // Критическая секция  
+        } finally {  
+            fairLock.unlock();  
+        }  
+    }  
+}
+```
+### 2. Использование ReadWriteLock
+```java
+public class ReadWriteLockExample {  
+  
+    private final ReadWriteLock rwLock = new ReentrantReadWriteLock(true);  
+    private final Lock readLock = rwLock.readLock();  
+    private final Lock writeLock = rwLock.writeLock();  
+  
+    public void readOperation() {  
+        readLock.lock();  
+        try {  
+            // Много читателей могут работать одновременно  
+        } finally {  
+            readLock.unlock();  
+        }  
+    }  
+  
+    public void writeOperation() {  
+        writeLock.lock();  
+        try {  
+            // Только один писатель  
+        } finally {  
+            writeLock.unlock();  
+        }  
+    }  
+}
+```
+### 3. Приоритизация с помощью Semaphore
+```java
+public class PrioritySemaphore {  
+  
+    private final Semaphore semaphore = new Semaphore(1, true); // FAIR semaphore  
+  
+    public void highPriorityTask() {  
+        if (semaphore.tryAcquire()) {  
+            try {  
+                // Высокоприоритетная задача  
+            } finally {  
+                semaphore.release();  
+            }  
+        } else {  
+            // Альтернативная логика  
+        }  
+    }  
+  
+    public void lowPriorityTask() {  
+        try {  
+            semaphore.acquire(); // Будет ждать своей очереди  
+            try {  
+                // Низкоприоритетная задача  
+            } finally {  
+                semaphore.release();  
+            }  
+        } catch (InterruptedException e) {  
+            Thread.currentThread().interrupt();  
+        }  
+    }  
+}
+```
+### 4. Использование условий с таймаутами
+```java
+public class TimeoutExample {  
+  
+    private final Lock lock = new ReentrantLock(true);  
+    private final Condition condition = lock.newCondition();  
+  
+    public boolean tryDoWork(long timeout, TimeUnit unit) {  
+        lock.lock();  
+        try {  
+            if (condition.await(timeout, unit)) {  
+                // Выполнить работу  
+                return true;  
+            } else {  
+                // Таймаут - возможно Starvation  
+                return false;  
+            }  
+        } catch (InterruptedException e) {  
+            Thread.currentThread().interrupt();  
+            return false;  
+        } finally {  
+            lock.unlock();  
+        }  
+    }  
+}
+```
+### 5. Работа с Thread Pool
