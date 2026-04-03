@@ -85,3 +85,91 @@ public class SynchronizedStarvation {
 | **Starvation** | Поток активен, но не может работать    | Несправедливое распределение ресурсов     |
 | **DeadLock**   | Потоки заблокированы навсегда          | Взаимное ожидание ресурсов                |
 | **LiveLock**   | Потоки активны, но бесполезно работают | Постоянная реакция на действия друг друга |
+## Реальные сценарии Starvation
+### 1. База данных с неправильными блокировками
+```java
+public class DatabaseStarvation {  
+  
+    private final ReentrantLock lock = new ReentrantLock();  
+  
+    public void longTransaction() {  
+        lock.lock();  
+        try {  
+            // Долгая транзакция (5 минут)  
+            Thread.sleep(30000);  
+        } catch (InterruptedException e) {  
+            Thread.currentThread().interrupt();  
+        } finally {  
+            lock.unlock();  
+        }  
+    }  
+  
+    public void shortTransaction() {  
+        // Этот поток будет ждать пока longTransaction завершится  
+        lock.lock();  
+        try {  
+            // Быстрая операция  
+        } finally {  
+            lock.unlock();  
+        }  
+    }  
+}
+```
+### 2. Web server с неправильным планированием
+```java
+public class WebServerStarvation {  
+  
+    private final ExecutorService executor = Executors.newFixedThreadPool(10);  
+  
+    public void handleRequest(Request request) {  
+        executor.submit(() -> {  
+            if (request.isHighPriority()) {  
+                // Обработка высокоприоритетного запроса  
+                processHighPriority(request);  
+            } else {  
+                // Низкоприоритетные запросы могут долго ждать  
+                processLowPriority(request);  
+            }  
+        });  
+    }  
+  
+    private void processHighPriority(Request request) {  
+        // Долгая обработка  
+        try {  
+            Thread.sleep(5000);  
+        } catch (InterruptedException e) {  
+            throw new RuntimeException(e);  
+        }  
+    }  
+  
+    private void processLowPriority(Request request) {  
+        // Быстрая обработка, но может никогда не начаться  
+    }  
+}
+```
+## Способы обнаружения Starvation
+### 1. Мониторинг времени ожидания
+```java
+public class WaitTimeMonitor {  
+  
+    private final Map<Long, Long> threadWaitStart = new ConcurrentHashMap<>();  
+    private final long starvationThreshold = 30000; // 30 секунд  
+  
+    public void recordWaitStart() {  
+        threadWaitStart.put(Thread.currentThread().getId(), System.currentTimeMillis());  
+    }  
+  
+    public void recordWaitEnd() {  
+        threadWaitStart.remove(Thread.currentThread().getId());  
+    }  
+  
+    public void checkForStarvation() {  
+        long currentTime = System.currentTimeMillis();  
+        threadWaitStart.forEach((threadId, startTime) -> {  
+            if (currentTime - startTime > starvationThreshold) {  
+                System.out.println("Starvation detected for thread: " + threadId);  
+            }  
+        });  
+    }  
+}
+```
