@@ -296,3 +296,25 @@ public class TimeoutExample {
 }
 ```
 ### 5. Работа с Thread Pool
+```java
+public class FairThreadPool {  
+  
+    private final ExecutorService executor = new ThreadPoolExecutor(  
+        10, // Минимальное число потоков  
+        10, // Максимальное число потоков (равно минимальному => пул фиксированный)  
+        0L, // Время жизни лишних потоков (здесь не используется, т.к. пул фиксированный)  
+        TimeUnit.MILLISECONDS, // Единица измерения времени жизни  
+        new LinkedBlockingQueue<>(100), // Очередь задач (до 100 задач в ожидании)  
+        Executors.defaultThreadFactory(), // Фабрика потоков (создает обычные потоки)  
+        new ThreadPoolExecutor.CallerRunsPolicy() // Политика при перевыполнении: задача выполняется в вызывающем потоке  
+    );  
+  
+    public void submitTasks(List<Runnable> tasks) {  
+        for (Runnable task : tasks) {  
+            executor.submit(task);  
+        }  
+    }  
+}
+```
+## Практические примеры решения
+### 1. Справедливый доступ к ресурсу
