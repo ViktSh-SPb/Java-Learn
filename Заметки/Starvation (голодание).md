@@ -318,3 +318,39 @@ public class FairThreadPool {
 ```
 ## Практические примеры решения
 ### 1. Справедливый доступ к ресурсу
+```java
+public class FairResourceAccess {  
+  
+    private final ReentrantLock fairLock = new ReentrantLock(true);  
+  
+    public void accessResource(String threadName) {  
+        System.out.println(threadName + " waiting for lock");  
+        fairLock.lock();  
+        try {  
+            System.out.println(threadName + " acquired lock");  
+            // Имитация работы  
+            Thread.sleep(1000);  
+        } catch (InterruptedException e) {  
+            Thread.currentThread().interrupt();  
+        } finally {  
+            fairLock.unlock();  
+            System.out.println(threadName + " released lock");  
+        }  
+    }  
+  
+    public static void main(String[] args) {  
+        FairResourceAccess resource = new FairResourceAccess();  
+  
+        // Создаем несколько потоков  
+        for (int i = 0; i < 5; i++) {  
+            final String name = "Thread-" + i;  
+            new Thread(() -> {  
+                while (true) {  
+                    resource.accessResource(name);  
+                }  
+            }).start();  
+        }  
+    }  
+}
+```
+### 2. Приоритетная обработка с fairness
