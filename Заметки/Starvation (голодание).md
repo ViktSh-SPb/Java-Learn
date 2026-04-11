@@ -1,5 +1,5 @@
 # Starvation (голодание)
-Starvation - это ситуация в многопоточном программировании, когда один или несколько потоков не могут получить доступ к общим ресурсам или не могут выполнить работу из-за того, что другие потоки постоянно монополизируют эти ресурсы.
+**Starvation** - это ситуация в многопоточном программировании, когда один или несколько потоков не могут получить доступ к общим ресурсам или не могут выполнить работу из-за того, что другие потоки постоянно монополизируют эти ресурсы.
 ## Ключевые характеристики Starvation
 - Поток жив и не заблокирован
 - Поток хочет работать, но не может
@@ -355,5 +355,78 @@ public class FairResourceAccess {
 ```
 ### 2. Приоритетная обработка с fairness
 ```java
-
+public class PriorityWithFairness {  
+  
+    private final ReentrantLock lock = new ReentrantLock(true);  
+    private final Condition highPriorityCondition = lock.newCondition();  
+    private final Condition normalPriorityCondition = lock.newCondition();  
+    private boolean highPriorityWorking = false;  
+  
+    public void highPriorityWork() {  
+        lock.lock();  
+        try {  
+            while (highPriorityWorking) {  
+                highPriorityCondition.await();  
+            }  
+            highPriorityWorking = true;  
+  
+            //Выполнение высокоприоритетной работы  
+            System.out.println("High priority work started");  
+            Thread.sleep(500);  
+            System.out.println("High priority work completed");  
+        } catch (InterruptedException e) {  
+            Thread.currentThread().interrupt();  
+        } finally {  
+            highPriorityWorking = false;  
+            normalPriorityCondition.signalAll();  
+            lock.unlock();  
+        }  
+    }  
+  
+    public void normalPriorityWork() {  
+        lock.lock();  
+        try {  
+            while (highPriorityWorking) {  
+                normalPriorityCondition.await();  
+            }  
+  
+            //Выполнение обычной работы  
+            System.out.println("Normal priority work started");  
+            Thread.sleep(100);  
+            System.out.println("Normal priority work completed");  
+        } catch (InterruptedException e) {  
+            Thread.currentThread().interrupt();  
+        } finally {  
+            lock.unlock();  
+        }  
+    }  
+}
+```
+## Инструменты для диагностики
+### 1. JStack и JVisualVM
+- Анализ состояния потоков
+- Выявление потоков в состоянии waiting
+### 2. Профилировщики производительности
+- Анализ времени ожидания
+- Выявление "горячих" критических секций
+### 3. Кастомные метрики
+```java
+public class StarvationDetector {  
+  
+    private final Map<String, Long> lastExecutionTime = new ConcurrentHashMap<>();  
+    private final long detectionThreshold = 60000; // 1 минута  
+  
+    public void recordExecution(String threadName) {  
+        lastExecutionTime.put(threadName, System.currentTimeMillis());  
+    }  
+  
+    public void checkForStarvation() {  
+        long currentTime = System.currentTimeMillis();  
+        lastExecutionTime.forEach((threadName, lastTime) -> {  
+            if (currentTime - lastTime > detectionThreshold) {  
+                System.out.println("Possible starvation: " + threadName);  
+            }  
+        });  
+    }  
+}
 ```
