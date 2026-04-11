@@ -354,3 +354,6 @@ public class FairResourceAccess {
 }
 ```
 ### 2. Приоритетная обработка с fairness
+```java
+
+```
