@@ -148,3 +148,74 @@ public DataSource dataSource() {
 	return ds;
 }
 ```
+## Основные настройки DataSource
+### DataSource
+#### URL
+```yaml
+spring:
+	datasource:
+		url: jdbc:postgresql://localhost:5432/shop
+```
+**jdbc** - Протокол JDBC
+**postgresql** - Тип БД
+**localhost** - Хост
+**5432** - Порт PostgreSQL
+**shop** - Имя базы
+#### Username/Password
+```yaml
+spring:
+	datasource:
+		username: postgres
+		password: 1234
+```
+#### Driver
+Обычно автоматически
+```yaml
+spring:
+	datasource:
+		driver-class-name: org.postgresql.Driver
+```
+### HikariCP
+#### Размер пула
+```yaml
+spring:
+	datasource:
+		hikari:
+			maximum-pool-size: 10
+```
+#### Минимум idle connections
+```yaml
+spring:
+	datasource:
+		hikari:
+			minimum-idle: 5
+```
+Hikari старается держать минимум 5 свободных готовых соединений. Если часть соединений заняли запросы, пул может создать новые. Когда нагрузка спадет, снова оставит минимум 5 idle-соединений. Если количество активных соединений становится равным max-pool-size, то idle будет равен 0.
+#### Timeout ожидания соединения
+```yaml
+spring:
+	datasource:
+		hikari:
+			connection-timeout: 30000
+```
+Если свободных соединений нет - поток будет ждать 30 секунд, затем выбросит SQLException / timeout.
+#### Maximum Lifetime
+```yaml
+spring:
+	datasource:
+		hikari:
+			max-lifetime: 1800000 # не держать соединение дольше 30 минут
+```
+Максимальное время жизни одного JDBC-соединения в пуле.
+##### Зачем это нужно:
+1. БД может закрывать старые соединения
+2. NAT/firewall/load balanser могут забывать соединения
+3. Соединения могут становиться битыми или stale
+#### Idle Timeout
+```yaml
+spring:
+	datasource:
+		hikari:
+			idle-timeout: 600000
+```
+Сколько хранить неиспользуемое соединение
