@@ -1,11 +1,19 @@
 # DataSource
-DataSource - это объект, через который приложение получает подключения к базе данных. Без него ни JPA, ни JdbcTemplate, ни Hibernate работать не смогут.
+**DataSource** - это объект, через который приложение получает подключения к базе данных. Без него ни *JPA*, ни *JdbcTemplate*, ни *Hibernate* работать не смогут.
 Когда приложение работает с базой данных, ему нужно:
 1. Знать, куда подключаться (URL базы)
 2. Знать логин и пароль
 3. Уметь создавать соединения
 4. Переиспользовать их, а не открывать заново каждый раз
 Именно этим и занимается DataSource.
+DataSource - центральный объект. Через него проходят:
+- JDBC
+- JPA
+- Hibernate
+- Transactions
+- Flyway
+- Liquibase
+- Spring Batch
 ### Как выглядит работа без DataSource
 Обычный JDBC:
 ```java
@@ -32,6 +40,50 @@ spring:
 - Свяжет все с JPA
 - Создаст JdbcTemplate
 - Будет управлять транзакциями
+### DataSource vs EntityManager
+
+| DataSource                               | EntityManager                                                    |
+| ---------------------------------------- | ---------------------------------------------------------------- |
+| - connections<br>- pool<br>- доступ к БД | - ORM<br>- entities<br>- persistence context<br>- dirty checking |
+### Минимальный рабочий пример
+#### dependencies
+```gradle
+implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+runtimeOnly 'org.postgresql:postgresql'
+```
+#### application.yaml
+```yaml
+spring:
+	datasource:
+		url: jdbc:postgresql://localhost:5432/shop
+		username: postgres
+		password: 1234
+	jpa:
+		hibernate:
+			ddl-auto: update
+```
+#### entity
+```java
+@Entity  
+public class User {  
+    @Id  
+    @GeneratedValue
+    Long id;  
+  
+    String name;  
+}
+```
+#### repository
+```java
+interface UserRepository extends JpaRepository<User, Long> {}
+```
+>[!done]
+>Spring Boot автоматически:
+>- создаст DataSource
+>- создаст Hikari pool
+>- подключит Hibernate
+>- настроит репозитории
+>- создаст transaction manager
 ## Архитектура:
 ```mermaid
 flowchart TD  
@@ -391,3 +443,17 @@ Spring Boot умеет автоматически запускать:
 - HSQLDB
 - Derby
 Если внешняя БД не настроена, очень удобно для тестов.
+## Частые ошибки
+#### 1. Driver not found
+```
+Cannot load driver class
+```
+#### 2. Connection refused
+Не удалось подключиться к БД
+#### 3. Too many connections
+- Пул слишком большой
+- Connections утекают
+#### 4. Timeout waiting for connection
+Все connections заняты
+#### 5. Wrong dialect
+Hibernate не понимает тип БД
