@@ -219,3 +219,175 @@ spring:
 			idle-timeout: 600000
 ```
 Сколько хранить неиспользуемое соединение
+## Как приложение использует DataSource
+### JdbcTemplate
+```java
+@Autowired
+JdbcTemplate jdbcTemplate;
+```
+Внутри:
+```mermaid
+flowchart TD  
+A[JdbcTemplate] --> B[DataSource]  
+B --> C[Connection]   
+```
+### JPA / Hibernate
+```java
+@Repository
+interface UserRepository extends JpaRepository<User, Long>
+```
+## Транзакции
+Spring:
+- Берет Connection из DataSource
+- Начинает transaction
+- Commit/rollback
+- Возвращает connection в pool
+⚠️Connection не закрывается физически. Когда пишешь `connection.close();` в pool это означает: "вернуть соединение обратно в пул", а не реально закрыть TCP-соединение.
+## Жизненный цикл запроса
+```mermaid
+flowchart TD
+
+A["Приходит запрос</br><code>GET /users</code>"]
+B["<nobr>Hibernate нужен Connection</nobr></br><code>getConnection()</code>"]
+C[Hikari выдает Connection]
+D["Выполняется SQL</br><code>SELECT * FROM users</code>"]
+E[Transaction commit]
+F[<nobr>Connection возвращается в pool</nobr>]
+
+A --> B
+B --> C
+C --> D
+D --> E
+E --> F
+```
+## Несколько DataSource
+Когда приложение работает не с одной базой данных или когда подключения должны иметь разное назначение, в Spring Boot могут создаваться несколько DataSource.
+Пример:
+```java
+@Bean
+@Primary
+DataSource mainDataSource() {
+}
+
+@Bean
+DataSource analyticsDataSource() {
+}
+```
+### Самые частые случаи:
+#### 1. Несколько разных БД
+Например:
+- PostgreSQL для основной бизнес-логики
+- ClickHouse для аналитики
+- Redis отдельно
+- Oracle у legacy-сервиса
+
+```mermaid
+flowchart TD
+
+APP["Spring Boot Application"]
+
+POSTGRES["PSQL DataSource"]
+CLICK_HOUSE["CH DataSource"]
+REDIS["Redis DataSource"]
+
+DB_A[("PostgreSQL")]
+DB_B[("ClickHouse")]
+DB_C[("Redis")]
+
+APP --> POSTGRES
+APP --> CLICK_HOUSE
+APP --> REDIS
+
+POSTGRES --> DB_A
+CLICK_HOUSE --> DB_B
+REDIS --> DB_C
+```
+В таком случае создают:
+```java
+@Bean
+DataSource mainDataSource()
+
+@Bean
+DataSource analytcsDataSource()
+```
+#### 2. Разделение read/write (replica setup)
+Есть:
+- master - запись
+- replica - чтение
+```mermaid
+flowchart TD
+
+APP["Spring Boot Application"]
+
+WRITE["WRITE"]
+READ["READ"]
+
+PRIMARY_DB[("Primary DB")]
+REPLICA_DB[("Replica DB")]
+
+APP --> WRITE
+APP --> READ
+
+WRITE --> PRIMARY_DB
+READ --> REPLICA_DB
+```
+Это помогает:
+- уменьшить нагрузку
+- масштабировать чтение
+#### 3. Микс JPA + batch processing
+Например:
+- Hibernate/JPA работает с основной БД
+- Spring Batch использует отдельную БД для job metadata
+```mermaid
+flowchart TD
+
+APP["Spring Boot App"]
+
+APP --> MAIN_DB[("Business DB")]
+APP --> BATCH_DB[("Batch Metadata DB")]
+
+MAIN_DB --> USERS["users/orders/products"]
+BATCH_DB --> META["BATCH_* tables"]
+```
+#### 4. Мультиарендность (multi-tenant)
+Когда у каждого клиента своя база
+```mermaid
+flowchart TD
+
+APP["Spring Boot Application"]
+
+CLIENT_A["clientA"]
+CLIENT_B["clientB"]
+CLIENT_C["clientC"]
+
+DB_A[("db_a")]
+DB_B[("db_b")]
+DB_C[("db_c")]
+
+APP --> CLIENT_A
+APP --> CLIENT_B
+APP --> CLIENT_C
+
+CLIENT_A --> DB_A
+CLIENT_B --> DB_B
+CLIENT_C --> DB_C
+```
+Тогда `RoutingDataSource` выбирает нужный `DataSource` динамически.
+#### 5. Постепенная миграция со старой системы
+Например:
+- Старая БД - Oracle
+- Новая БД - PostgreSQL
+Приложение временно читает из обеих.
+#### 6. Разные транзакционные требования
+Иногда:
+- Одна БД XA/JTA (распределенные транзакции)
+- Другая обычная
+Или:
+- Одна connection pool c aggressive timeout
+- Другая для long-running queries
+## Embedded Database
+Spring Boot умеет автоматически запускать:
+- H2
+- HSQLDB
+- Derby
+Если внешняя БД не настроена, очень удобно для тестов.
