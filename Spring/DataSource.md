@@ -5,15 +5,15 @@
 2. Знать логин и пароль
 3. Уметь создавать соединения
 4. Переиспользовать их, а не открывать заново каждый раз
-Именно этим и занимается DataSource.
-DataSource - центральный объект. Через него проходят:
-- JDBC
-- JPA
-- Hibernate
-- Transactions
-- Flyway
-- Liquibase
-- Spring Batch
+Именно этим и занимается **DataSource**.
+**DataSource** - центральный объект. Через него проходят:
+- *JDBC*
+- *JPA*
+- *Hibernate*
+- *Transactions*
+- *Flyway*
+- *Liquibase*
+- *Spring Batch*
 ### Как выглядит работа без DataSource
 Обычный JDBC:
 ```java
@@ -23,23 +23,7 @@ Connection connection = DriverManager.getConnection(
 	"password"
 )
 ```
-Каждый раз открывается новое соединение, тратятся ресурсы. Это медленно, сложно управлять. SpringBoot делает это централизованно через DataSource.
-### Главная идея Spring Boot
-В Spring Boot, в application.yml необходимо просто прописать:
-```yaml
-spring:
-	datasource:
-		url: jdbc:postgresql://localhost:5432/shop
-		username: postgres
-		password: 1234
-```
-И Spring Boot автоматически:
-- Создаст DataSource
-- Подключит пул соединений
-- Настроит Hibernate
-- Свяжет все с JPA
-- Создаст JdbcTemplate
-- Будет управлять транзакциями
+Каждый раз открывается новое соединение, тратятся ресурсы. Это медленно, сложно управлять. SpringBoot делает это централизованно через **DataSource**.
 ### DataSource vs EntityManager
 
 | DataSource                               | EntityManager                                                    |
@@ -94,7 +78,7 @@ D --> E[JDBC Driver]
 E --> F[Database]  
 ```
 ### 1. Database
-Это сама база (Postgresql, MySQL, Oracle, H2, MariaDB)
+Это сама база (*Postgresql*, *MySQL*, *Oracle*, *H2*, *MariaDB*)
 ### 2. JDBC Driver
 Java не умеет напрямую говорить с PostgreSQL. Нужен драйвер, например:
 ```gradle
@@ -144,9 +128,9 @@ maximumPoolSize: 10
 - зависшие транзакции
 - слишком долгие запросы
 #### Какой пул использует Spring Boot
-По умолчанию - HikariCP. Это очень быстрый современный пул. Spring Boot автоматически подключает его.
-DataSource - это не сам пул.
-DataSource - это интерфейс:
+По умолчанию - **HikariCP**. Это очень быстрый современный пул. Spring Boot автоматически подключает его.
+**DataSource** - это не сам пул.
+**DataSource** - это интерфейс:
 ```java
 javax.sql.DataSource
 ```
@@ -175,13 +159,13 @@ spring:
 	datasource:
 		url: ...
 ```
-и JDBC driver в зависимостях, он создает HikariDataSource автоматически.
+и JDBC driver в зависимостях, он создает **HikariDataSource** автоматически.
 ### Как Boot понимает что создавать
 Boot анализирует classpath. Если есть:
 - postgresql driver
 - HikariCP
 - spring-jdbc
-значит можно создать DataSource.
+значит можно создать **DataSource**.
 #### Условная автоконфигурация
 Внутри Boot есть примерно такая логика:
 ```java
@@ -242,7 +226,7 @@ spring:
 		hikari:
 			minimum-idle: 5
 ```
-Hikari старается держать минимум 5 свободных готовых соединений. Если часть соединений заняли запросы, пул может создать новые. Когда нагрузка спадет, снова оставит минимум 5 idle-соединений. Если количество активных соединений становится равным max-pool-size, то idle будет равен 0.
+**Hikari** старается держать минимум 5 свободных готовых соединений. Если часть соединений заняли запросы, пул может создать новые. Когда нагрузка спадет, снова оставит минимум 5 idle-соединений. Если количество активных соединений становится равным max-pool-size, то idle будет равен 0.
 #### Timeout ожидания соединения
 ```yaml
 spring:
@@ -294,7 +278,8 @@ Spring:
 - Начинает transaction
 - Commit/rollback
 - Возвращает connection в pool
-⚠️Connection не закрывается физически. Когда пишешь `connection.close();` в pool это означает: "вернуть соединение обратно в пул", а не реально закрыть TCP-соединение.
+>[!attention]
+Connection не закрывается физически. Когда пишешь `connection.close();` в pool это означает: "вернуть соединение обратно в пул", а не реально закрыть TCP-соединение.
 ## Жизненный цикл запроса
 ```mermaid
 flowchart TD
@@ -328,10 +313,10 @@ DataSource analyticsDataSource() {
 ### Самые частые случаи:
 #### 1. Несколько разных БД
 Например:
-- PostgreSQL для основной бизнес-логики
-- ClickHouse для аналитики
-- Redis отдельно
-- Oracle у legacy-сервиса
+- *PostgreSQL* для основной бизнес-логики
+- *ClickHouse* для аналитики
+- *Redis* отдельно
+- *Oracle* у legacy-сервиса
 
 ```mermaid
 flowchart TD
@@ -364,8 +349,8 @@ DataSource analytcsDataSource()
 ```
 #### 2. Разделение read/write (replica setup)
 Есть:
-- master - запись
-- replica - чтение
+- **master** - запись
+- **replica** - чтение
 ```mermaid
 flowchart TD
 
@@ -427,8 +412,8 @@ CLIENT_C --> DB_C
 Тогда `RoutingDataSource` выбирает нужный `DataSource` динамически.
 #### 5. Постепенная миграция со старой системы
 Например:
-- Старая БД - Oracle
-- Новая БД - PostgreSQL
+- Старая БД - *Oracle*
+- Новая БД - *PostgreSQL*
 Приложение временно читает из обеих.
 #### 6. Разные транзакционные требования
 Иногда:
