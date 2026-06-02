@@ -8,3 +8,4 @@ Map<String, Integer> map = new HashMap<>();
 map.put("Alice", 25);
 map.put("Bob", 30);
 ```
+## Устройство HashMap
