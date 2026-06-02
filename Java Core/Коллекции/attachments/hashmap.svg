@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="500" viewBox="0 0 960 500">
+<style>
+text { font-family: Arial, sans-serif; font-size: 14px;}
+.title { font-size: 20px; font-weight: bold;  fill: lightgray; }
+.subtitle { font-size: 16px; font-weight: bold;  fill: lightgray; }
+.key { fill:#eef2ff; stroke:#818cf8; stroke-width:1.5; }
+.bucket { fill:#f0fdfa; stroke:#2dd4bf; stroke-width:1.5; }
+.entry { fill:#f5f3ff; stroke:#a78bfa; stroke-width:1.5; }
+.note { fill:#fff8dc; stroke:#d4b000; }
+.line { stroke:#444; stroke-width:2; fill:none; marker-end:url(#arrow); }
+.ptr { stroke:#666; stroke-width:2; fill:none; marker-end:url(#arrow); }
+.small { font-size:12px; fill:#444; }
+</style>
+
+<defs>
+  <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+    <path d="M0,0 L0,6 L9,3 z" fill="#444"/>
+  </marker>
+</defs>
+
+<text x="40" y="40" class="title">Структура HashMap</text>
+
+<!-- Keys -->
+<text x="20" y="90" class="subtitle">Keys</text>
+
+<rect class="key" x="20" y="110" width="170" height="30"/><text x="105" y="130" text-anchor="middle">John Smith</text>
+<rect class="key" x="20" y="160" width="170" height="30"/><text x="105" y="180" text-anchor="middle">Lisa Smith</text>
+<rect class="key" x="20" y="210" width="170" height="30"/><text x="105" y="230" text-anchor="middle">Sam Doe</text>
+<rect class="key" x="20" y="260" width="170" height="30"/><text x="105" y="280" text-anchor="middle">Sandra Dee</text>
+<rect class="key" x="20" y="310" width="170" height="30"/><text x="105" y="330" text-anchor="middle">Ted Baker</text>
+
+<!-- Buckets array -->
+<text x="320" y="90" class="subtitle">Buckets array</text>
+
+<rect class="bucket" x="320" y="110" width="80" height="40"/><text x="360" y="135" text-anchor="middle">[0]</text>
+<rect class="bucket" x="320" y="160" width="80" height="40"/><text x="360" y="185" text-anchor="middle">[1]</text>
+<rect class="bucket" x="320" y="210" width="80" height="40"/><text x="360" y="235" text-anchor="middle">[2]</text>
+<rect class="bucket" x="320" y="260" width="80" height="40"/><text x="360" y="285" text-anchor="middle">[3]</text>
+<rect class="bucket" x="320" y="310" width="80" height="40"/><text x="360" y="335" text-anchor="middle">[4]</text>
+<rect class="bucket" x="320" y="360" width="80" height="40"/><text x="360" y="385" text-anchor="middle">[5]</text>
+
+<!-- Entry helper -->
+<text x="480" y="90" class="subtitle">Etnries List</text>
+
+<!-- E2 -->
+<rect class="entry" x="480" y="110" width="180" height="60"/>
+<line x1="480" y1="140" x2="660" y2="140" stroke="#a78bfa"/>
+<text x="570" y="130" text-anchor="middle">Lisa Smith</text>
+<text x="570" y="160" text-anchor="middle">521-8976</text>
+
+<!-- E1 -->
+<rect class="entry" x="480" y="180" width="180" height="60"/>
+<line x1="480" y1="210" x2="660" y2="210" stroke="#a78bfa"/>
+<text x="570" y="200" text-anchor="middle">John Smith</text>
+<text x="570" y="230" text-anchor="middle">521-1234</text>
+
+<!-- E4 collision -->
+<rect class="entry" x="760" y="180" width="180" height="60"/>
+<line x1="760" y1="210" x2="940" y2="210" stroke="#a78bfa"/>
+<text x="850" y="200" text-anchor="middle">Sandra Dee</text>
+<text x="850" y="230" text-anchor="middle">521-9655</text>
+
+<!-- E5 -->
+<rect class="entry" x="480" y="330" width="180" height="60"/>
+<line x1="480" y1="360" x2="660" y2="360" stroke="#a78bfa"/>
+<text x="570" y="350" text-anchor="middle">Ted Baker</text>
+<text x="570" y="380" text-anchor="middle">521-4321</text>
+
+<!-- E3 -->
+<rect class="entry" x="480" y="260" width="180" height="60"/>
+<line x1="480" y1="290" x2="660" y2="290" stroke="#a78bfa"/>
+<text x="570" y="280" text-anchor="middle">Sam Doe</text>
+<text x="570" y="310" text-anchor="middle">521-5030</text>
+
+<!-- hash arrows -->
+<path class="line" d="M190 125 C250 125,250 195,320 180"/>
+
+<path class="line" d="M190 175 C250 175,250 135,320 130"/>
+
+<path class="line" d="M190 225 C250 225,250 330,320 330"/>
+
+<path class="line" d="M190 275 C250 275,250 195,320 180"/>
+
+<path class="line" d="M190 325 C250 325,250 280,320 280"/>
+
+<!-- bucket pointers -->
+<line class="ptr" x1="400" y1="130" x2="480" y2="140"/>
+<line class="ptr" x1="400" y1="180" x2="480" y2="210"/>
+<line class="ptr" x1="400" y1="330" x2="480" y2="360"/>
+<line class="ptr" x1="400" y1="280" x2="480" y2="290"/>
+
+<!-- collision chain -->
+<line class="ptr" x1="660" y1="210" x2="760" y2="210"/>
+
+</svg>

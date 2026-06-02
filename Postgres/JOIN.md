@@ -3,7 +3,7 @@
 
 Есть 5 основных типов JOIN-ов, и каждый решает свою задачу.
 ## 1. INNER JOIN - внутреннее соединение
-![Alt text](./attachments/inner.svg)
+![Inner Join](./attachments/inner.svg)
 - Выдает только те строки, где в обеих таблицах есть совпадение по условию соединения.
 - Формула: "Дай мне пересечение таблиц"
 - Пример:
@@ -14,7 +14,7 @@ INNER JOIN departments ON employees.dept_id = departments.id;
 ```
 - Вернет только тех сотрудников, у которых есть отдел.
 ## 2. LEFT JOIN (LEFT OUTER JOIN) - левое внешнее соединение
-![Alt text](./attachments/left.svg)
+![Left Join](./attachments/left.svg)
 - Возвращает все строки из левой таблицы, даже если в правой нет соответствий.
 - Если нет совпадения - поля из правой таблицы будут NULL.
 - Пример:
@@ -25,7 +25,7 @@ LEFT JOIN departments ON employees.dept_id = departments.id;
 ```
 - Вернет всех сотрудников, даже если они не прикреплены к отделу.
 ## RIGHT JOIN (RIGHT OUTER JOIN) - правое внешнее соединение
-![Alt text](./attachments/right.svg)
+![Right Join](./attachments/right.svg)
 - Противоположность LEFT JOIN: все строки из правой таблицы, даже без совпадений слева.
 - Пример:
 ```sql
@@ -35,7 +35,7 @@ RIGHT JOIN departments ON employees.dept_id = departments.id;
 ```
 - Покажет все отделы, даже если в них нет сотрудников.
 ## 4. FULL JOIN (FULL OUTER JOIN) - полное внешнее соединение
-![Alt text](./attachments/full.svg)
+![Full Join](./attachments/full.svg)
 - Возвращает все строки из обеих таблиц.
 - Где нет совпадений - заполняется NULL.
 - Пример:
@@ -46,7 +46,7 @@ FULL OUTER JOIN departments ON employees.dept_id = departments.id;
 ```
 - Вернет всех сотрудников и все отделы, включая одиночные записи без пар.
 ## 5. CROSS JOIN - декартово произведение
-![Alt text](./attachments/cross.svg)
+![Cross Join](./attachments/cross.svg)
 - Соединяет каждую строку одной таблицы с каждой строкой другой таблицы.
 - Используется редко, чаще в генерации тестовых данных или переборе комбинаций.
 - Пример:
