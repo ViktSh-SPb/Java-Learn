@@ -95,5 +95,85 @@ class SomeKey {
 #### Условие:
 Все ли тут верно?
 ```java
-
+public class GenericExceptions {  
+  
+    static class GenericException<T> extends RuntimeException {  
+  
+        private T info;  
+  
+        public GenericException(String message, T info) {  
+            super(message);  
+            this.info = info;  
+        }  
+    }  
+  
+    public static void main(String[] args) {  
+        try {  
+            doLogic();  
+        } catch (Exception unexpectedEx) {  
+            handleUnexpectedException(unexpectedEx);  
+        } catch (GenericException<DbConnectionInfo> |
+				GenericException<NotFoundInfo> |  
+                GenericException<HttpInfo> genericEx) {  
+            handleGenericException(genericEx);  
+        }  
+    }  
+}
+```
+#### Решение:
+```java
+```
+### Задача 3
+#### Условие:
+Насколько корректен этот код?
+Какова иерархия исключений?
+Если в методе выбрасывается checked исключение, что будет с транзакцией? Что будет с данными, которые были записаны до IOException?
+Throwable - это какой тип данных?
+```java
+public class GenericExceptions {  
+  
+    static class GenericException extends RuntimeException {  
+  
+        private Object info;  
+  
+        public GenericException(String message, Object info) {  
+            super(message);  
+            this.info = info;  
+        }  
+    }  
+  
+    public static void main(String[] args) {  
+        try {  
+            doLogic();  
+        } catch (Exception unexpectedEx) {  
+            handleUnexpectedException(unexpectedEx);  
+        } catch (GenericException genericEx) {  
+            handleGenericException(genericEx);  
+        }  
+    }  
+}
+```
+```java
+public class OomTask {  
+  
+    static Optional<byte[]> tryAllocateImageBuffer(int size) {  
+        try {  
+            return Optional.of(new byte[size]);  
+        } catch (OutOfMemoryError error) {  
+            error.printStackTrace();  
+            return Optional.empty();  
+        }  
+    }  
+  
+    public static void main(String[] args) {  
+        if (tryAllocateImageBuffer(Integer.MAX_VALUE).isPresent()) {  
+            System.out.println("Image buffer has been allocated");  
+        } else {  
+            System.out.println("Image buffer hasn't been allocated");  
+        }  
+    }  
+}
+```
+#### Решение:
+```java
 ```
