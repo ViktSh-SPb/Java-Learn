@@ -77,10 +77,12 @@ class SomeKey {
         this.value = val;  
     }  
   
+	@Override
     public int hashCode() {  
         return 1;  
     }  
   
+	@Override
     public boolean equals(Object obj) {  
         if (obj instanceof SomeKey) {  
             return value.equals(((SomeKey) obj).value);  
@@ -124,7 +126,7 @@ public class GenericExceptions {
 #### Решение:
 ```java
 ```
-### Задача 3
+### Задача 4
 #### Условие:
 Насколько корректен этот код?
 Какова иерархия исключений?
@@ -177,4 +179,44 @@ public class OomTask {
 ```
 #### Решение:
 ```java
+```
+### Задача 5
+#### Условие:
+Выведется ли последняя строчка?
+```java
+public class Main {  
+  
+    public static void main(String[] args) {  
+        byte[] arr;  
+        try {  
+            arr = new byte[Integer.MAX_VALUE * Integer.MAX_VALUE * Integer.MAX_VALUE  
+                * Integer.MAX_VALUE * Integer.MAX_VALUE];  
+        } finally {  
+            System.out.println("Finally block");  
+        }  
+        System.out.println("done");  
+    }  
+}
+```
+#### Решение:
+```java
+```
+### Задача 6
+#### Условие:
+Что выведет следующий код?
+```java
+public class Main {  
+  
+    public static void main(String[] args) {  
+        fun(4);  
+    }  
+  
+    public static void fun(int x) {  
+        if (x > 0) {  
+            fun(--x);  
+            System.out.print(x + " ");  
+            fun(--x);  
+        }  
+    }  
+}
 ```
