@@ -282,9 +282,22 @@ code
 ```
 ### Задача 11
 #### Условие:
-Условие
+Что произойдет?
 ```java
-code
+public static void main(String[] args) {  
+    List<String> list = new ArrayList<>();  
+    list.add("A");  
+    list.add("B");  
+    list.add("C");  
+    list.add("D");  
+  
+    for (String item : list) {  
+        if ("B".equals(item)) {  
+            list.remove(item);  
+        }  
+    }  
+    System.out.println(list);  
+}
 ```
 #### Решение:
 ```java

@@ -79,9 +79,21 @@ code
 ```
 ### Задача 2
 #### Условие:
-Условие
+Какие проблемы есть в коде?
 ```java
-code
+@RestController  
+@RequestMapping("/payments")  
+public class PaymentController {  
+  
+    @Autowired  
+    private PaymentService paymentService;  
+  
+    @Transactional  
+    @PostMapping    public String makePayment(@RequestBody PaymentDto paymentDto) {  
+        paymentService.process(paymentDto);  
+        return "Success";  
+    }  
+}
 ```
 #### Решение:
 ```java
@@ -89,9 +101,26 @@ code
 ```
 ### Задача 3
 #### Условие:
-Условие
+В чем проблема? Как можно решить?
 ```java
-code
+@Service  
+public class ServiceA {  
+    private final ServiceB serviceB;  
+  
+    @Autowired  
+    public ServiceA(ServiceB serviceB){  
+        this.serviceB = serviceB;  
+    }  
+}  
+  
+public class ServiceB {  
+    private final ServiceA serviceA;  
+  
+    @Autowired  
+    public ServiceB(ServiceA serviceA){  
+        this.serviceA = serviceA;  
+    }  
+}
 ```
 #### Решение:
 ```java

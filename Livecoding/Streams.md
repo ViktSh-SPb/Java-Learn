@@ -147,3 +147,23 @@ String strings[] = {"u", "z", "c", "a", "a", "b"};
 ```java
 
 ```
+### Задача 15
+#### Условие:
+Что будет выведено?
+```java
+public static void main(String[] args) {  
+    List<Integer> list = List.of(5, 2, 6, 1, 3, 4);  
+    list.stream()  
+        .filter(num -> {  
+            System.out.println("Filter - " + num);  
+            return num % 2 == 0;  
+        })  
+        .peek(num -> System.out.println("Peek - " + num))  
+        .sorted()  
+        .forEach(num -> System.out.println("ForEach - " + num));  
+}
+```
+#### Решение:
+```java
+
+```
