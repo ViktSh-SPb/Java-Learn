@@ -268,9 +268,13 @@ code
 ```
 ### Задача 10
 #### Условие:
-Условие
+Что будет напечатано?
 ```java
-code
+List<Optional<String>> optionals = List.of(Optional.of("foo"), Optional.empty(), Optional.of("bar"));  
+List<String> result = optionals.stream()  
+    .flatMap(opt -> opt.stream())  
+    .collect(Collectors.toList());  
+System.out.println(result);
 ```
 #### Решение:
 ```java
