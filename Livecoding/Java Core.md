@@ -220,3 +220,119 @@ public class Main {
     }  
 }
 ```
+### Задача 7
+#### Условие:
+Почему здесь нежелательно выполнять бизнес-логику в конструкторе? Какие последствия?
+```java
+@Service  
+public class NotificationService {  
+  
+    private String token;  
+  
+    @Autowired  
+    private ExternalAuthService externalAuthService;  
+  
+    public NotificationService() {  
+        this.token = externalAuthService.getToken();  
+        externalAuthService.doSomething();  
+    }  
+}
+```
+#### Решение:
+```java
+```
+### Задача 8
+#### Условие:
+Что будет выведено на экран? Почему?
+```java
+List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);  
+numbers.stream()  
+    .filter(n -> n % 2 == 0)  
+    .map(n -> n * 2);  
+System.out.println(numbers);
+```
+#### Решение:
+```java
+code
+```
+### Задача 9
+#### Условие:
+Что будет напечатано?
+```java
+List<String> list = Arrays.asList("A", "B", "C");  
+list.stream().peek(System.out::println);
+```
+#### Решение:
+```java
+code
+```
+### Задача 10
+#### Условие:
+Условие
+```java
+code
+```
+#### Решение:
+```java
+code
+```
+### Задача 11
+#### Условие:
+Условие
+```java
+code
+```
+#### Решение:
+```java
+code
+```
+### Задача 12
+#### Условие:
+Условие
+```java
+code
+```
+#### Решение:
+```java
+code
+```
+### Задача 13
+#### Условие:
+Условие
+```java
+code
+```
+#### Решение:
+```java
+code
+```
+### Задача 14
+#### Условие:
+Условие
+```java
+code
+```
+#### Решение:
+```java
+code
+```
+### Задача 15
+#### Условие:
+Условие
+```java
+code
+```
+#### Решение:
+```java
+code
+```
+### Задача 16
+#### Условие:
+Условие
+```java
+code
+```
+#### Решение:
+```java
+code
+```
