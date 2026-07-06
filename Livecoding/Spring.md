@@ -128,9 +128,27 @@ code
 ```
 ### Задача 4
 #### Условие:
-Условие
+Что произойдет с транзакцией? Какие могут возникнуть проблемы?
 ```java
-code
+@Service  
+public class OrderService {  
+  
+    @Autowired  
+    private PaymentService paymentService;  
+  
+    @Transactional  
+    public void placeOrder(Order order) {  
+        orderRepository.save(order);  
+        paymentService.charge(order.getPaymentDetails());  
+    }  
+}  
+  
+public class PaymentService {  
+    @Transactional(propagation = Propagation.REQUIRES_NEW)  
+    public void charge(PaymentDetails paymentDetails) {  
+        // списание денег  
+    }  
+}
 ```
 #### Решение:
 ```java
