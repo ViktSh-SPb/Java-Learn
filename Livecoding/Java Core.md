@@ -1,4 +1,3 @@
-
 # Java Core
 ### Задача 1
 #### Условие:
@@ -305,9 +304,42 @@ code
 ```
 ### Задача 12
 #### Условие:
-Условие
+Есть ли в следующем коде проблемы? Что будет выведено?
 ```java
-code
+public class Main {  
+    public static void main(String[] args) {  
+        Map<SomeKey, String> test = new HashMap<>();  
+        SomeKey key1 = new SomeKey("firstKey");  
+        SomeKey key2 = new SomeKey("secondKey");  
+        test.put(key1, "firstValue");  
+        test.put(key2, "secondValue");  
+        System.out.println(test.get(key1));  
+        SomeKey key3 = new SomeKey("secondKey");  
+        System.out.println(test.get(key3));  
+        key2.value = "";  
+        System.out.println(test.get(key2));  
+    }  
+}  
+  
+class SomeKey {  
+    public String value;  
+  
+    SomeKey(String val) {  
+        this.value = val;  
+    }  
+  
+    public boolean equals(Object obj) {  
+        if (obj instanceof SomeKey someKey) {  
+            return value.equals(someKey.value);  
+        }  
+        return false;  
+    }  
+  
+    @Override  
+    public int hashCode() {  
+        ...  
+    }  
+}
 ```
 #### Решение:
 ```java
@@ -315,9 +347,16 @@ code
 ```
 ### Задача 13
 #### Условие:
-Условие
+Будет ли что-то выведено? Если будет, то что?
 ```java
-code
+public class Main {  
+    public static void main(String[] args) {  
+        List<Integer> ints = Arrays.asList(1, 1);  
+        List raw = ints;  
+        List<String> strings = raw;  
+        System.out.println(Objects.equals(strings.get(0), strings.get(1)));  
+    }  
+}
 ```
 #### Решение:
 ```java
@@ -325,9 +364,35 @@ code
 ```
 ### Задача 14
 #### Условие:
-Условие
+Что будет выведено на экран?
 ```java
-code
+public class Solution {  
+    public static void main(String[] args) {  
+        Integer a = 0;  
+        int b = 0;  
+        String d = "0";  
+  
+        increment(a);  
+        increment(b);  
+        increment(d);  
+  
+        System.out.println(a);  
+        System.out.println(b);  
+        System.out.println(d);  
+    }  
+  
+    public static void increment(Integer a) {  
+        ++a;  
+    }  
+  
+    public static void increment(int b) {  
+        ++b;  
+    }  
+  
+    public static void increment(String d) {  
+        d = String.valueOf(Integer.parseInt(d) + 1);  
+    }  
+}
 ```
 #### Решение:
 ```java
@@ -335,9 +400,19 @@ code
 ```
 ### Задача 15
 #### Условие:
-Условие
+Как отработает следующий код?
 ```java
-code
+public class Main {  
+    public static void main(String[] args) {  
+        byte[] arr;  
+        try {  
+            arr = new byte[Integer.MAX_VALUE Integer.MAX_VALUE Integer.MAX_VALUE];  
+        } finally {  
+            System.out.println("finally block");  
+        }  
+        System.out.println("done");  
+    }  
+}
 ```
 #### Решение:
 ```java
@@ -345,9 +420,19 @@ code
 ```
 ### Задача 16
 #### Условие:
-Условие
+Есть ли ошибки в следующем коде? Если изменить список на List\<?> fruits, как это повлияет на поведение?
 ```java
-code
+public class Main {  
+    public static void main(String[] args) {  
+        List<? extends Fruit> fruits = new ArrayList<>();  
+        fruits.add(new Apple());  
+        fruits.add(new Orange());  
+    }  
+      
+    class Fruit {}  
+    class Apple extends Fruit {}  
+    class Orange extends Fruit {}  
+}
 ```
 #### Решение:
 ```java

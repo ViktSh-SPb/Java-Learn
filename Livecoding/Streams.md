@@ -167,3 +167,87 @@ public static void main(String[] args) {
 ```java
 
 ```
+### Задача 16
+#### Условие:
+Что будет выведено на экран? Как изменится вывод, если между `.peek(System.out::println)`  и `.filter(s -> s.startsWith("2")) ` добавить `sorted()`?
+```java
+public class Phones {  
+    public static void main(String[] args) {  
+        Stream.of(new Phone(1, "1"), new Phone(2, "2"))  
+                .map(Object::toString)  
+                .peek(System.out::println)  
+                .peek(System.out::println)  
+                .filter(s -> s.startsWith("2"))  
+                .forEach(System.out::println);  
+    }  
+}  
+  
+class Phone {  
+    private int code;  
+    private String number;  
+  
+    public Phone(int code, String number) {  
+        this.code = code;  
+        this.number = number;  
+    }  
+  
+    @Override  
+    public String toString() {  
+        return number;  
+    }  
+}
+```
+#### Решение:
+```java
+code
+```
+### Задача 17
+#### Условие:
+Условие
+```java
+code
+```
+#### Решение:
+```java
+code
+```
+### Задача 18
+#### Условие:
+Условие
+```java
+code
+```
+#### Решение:
+```java
+code
+```
+### Задача 19
+#### Условие:
+Условие
+```java
+code
+```
+#### Решение:
+```java
+code
+```
+### Задача 20
+#### Условие:
+Условие
+```java
+code
+```
+#### Решение:
+```java
+code
+```
+### Задача 21
+#### Условие:
+Условие
+```java
+code
+```
+#### Решение:
+```java
+code
+```
